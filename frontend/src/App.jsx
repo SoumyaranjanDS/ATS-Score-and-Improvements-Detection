@@ -1,23 +1,16 @@
-import React from 'react'
-import { Route, createBrowserRouter, BrowserRouter } from 'react-router-dom'
-import Hero from './pages/Hero'
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Hero from "./pages/Hero";
 
 const App = () => {
-
-  const routes = createBrowserRouter([
-    {
-      path : '/hero',
-      element : <Hero />
-    }
-  ])
-
   return (
-    <BrowserRouter routes={routes}>
-    <div>
-      <Hero />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Hero />} />
+        <Route path="/hero" element={<Hero />} />
+      </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};
 
-export default App
+export default App;

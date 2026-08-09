@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, createBrowserRouter } from 'react-router-dom'
+import { Route, createBrowserRouter, BrowserRouter } from 'react-router-dom'
 import Hero from './pages/Hero'
 
 const App = () => {
@@ -12,9 +12,11 @@ const App = () => {
   ])
 
   return (
+    <BrowserRouter routes={routes}>
     <div>
       <Hero />
     </div>
+    </BrowserRouter>
   )
 }
 

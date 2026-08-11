@@ -1,5 +1,6 @@
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
 import { extractPdfText } from "../services/pdfService.js";
+import { parseResumeWithAI } from "../services/geminiService.js";
 
 const uploadFile = async (req, res) => {
   try {
@@ -11,6 +12,8 @@ const uploadFile = async (req, res) => {
     }
 
     const pdfText = await extractPdfText(req.file.buffer);
+
+    const resumeData = await parseResumeWithAI(pdfText);
 
     const result = await uploadToCloudinary(req.file.buffer, {
       folder: "ats-resume",
@@ -26,6 +29,7 @@ const uploadFile = async (req, res) => {
         format: result.format,
         size: result.bytes,
         text: pdfText,
+        parsedData: resumeData,
       },
     });
   } catch (error) {

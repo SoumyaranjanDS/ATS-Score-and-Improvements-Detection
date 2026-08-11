@@ -6,6 +6,7 @@ const Hero = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+  const [data, setData] = useState("")
 
   const fileUpload = async (e) => {
     e.preventDefault();
@@ -25,6 +26,7 @@ const Hero = () => {
 
       const response = await api.post("/upload", formData);
       console.log(response.data);
+      setData(response.data)
 
       setError(false);
       setMessage(response.data.message || "File uploaded successfully!");
@@ -70,6 +72,9 @@ const Hero = () => {
       >
         {loading ? "Uploading..." : "Upload"}
       </button>
+      <div className="w-full max-w-lg overflow-auto">
+        {data && <pre className="text-left text-xs sm:text-sm mt-4 bg-slate-50 p-4 rounded-xl border border-slate-200">{JSON.stringify(data, null, 2)}</pre>}
+      </div>
     </div>
   );
 };

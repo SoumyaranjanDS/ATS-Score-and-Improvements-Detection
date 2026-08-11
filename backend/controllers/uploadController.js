@@ -15,6 +15,10 @@ const uploadFile = async (req, res) => {
 
     const resumeData = await parseResumeWithAI(pdfText);
 
+    const improvementCount = resumeData.improvements.length;
+
+    const atsScore = resumeData.atsScore;
+
     const result = await uploadToCloudinary(req.file.buffer, {
       folder: "ats-resume",
       resource_type: "auto",
@@ -28,8 +32,10 @@ const uploadFile = async (req, res) => {
         publicId: result.public_id,
         format: result.format,
         size: result.bytes,
-        text: pdfText,
-        parsedData: resumeData,
+        // text: pdfText,
+        // parsedData: resumeData,
+        improvements : improvementCount,
+        atsScore : atsScore
       },
     });
   } catch (error) {

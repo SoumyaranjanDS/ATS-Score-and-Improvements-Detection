@@ -6,24 +6,51 @@ const ai = new GoogleGenAI({
 
 export const parseResumeWithAI = async (resumeText) => {
   const prompt = `
-You are an expert ATS resume parser.
+You are a highly analytical ATS (Applicant Tracking System) and expert technical recruiter.
+Your goal is to evaluate the provided resume and output a realistic ATS score and improvement plan.
 
-Analyze the resume text provided below and extract the information into the
-exact JSON structure requested.
+Do NOT try to make the candidate feel good. Be brutally honest, objective, and conservative.
 
-IMPORTANT RULES:
+EVALUATION CRITERIA FOR ATS SCORE (0-100):
+To calculate the ATS Score, objectively grade the resume on the following 4 dimensions:
 
-1. Do not invent information.
-2. If information is missing, use an empty string or empty array.
-3. Extract skills explicitly mentioned in the resume.
-4. Keep experience descriptions factual.
-5. Do not evaluate the candidate yet.
-6. Do not calculate an ATS score yet.
-7. Return only structured resume information.
+1. Parseability & Formatting (25 points)
+   - Are standard headings used (e.g., Experience, Education, Skills)?
+   - Is the contact information (Email, Phone, LinkedIn/GitHub) clearly identifiable?
+   - Deduct points for complex formatting, missing standard sections, or confusing layouts.
 
-RESUME TEXT:
+2. Impact & Quantifiable Metrics (30 points)
+   - Do the bullet points use the STAR method (Situation, Task, Action, Result)?
+   - Are there concrete, quantifiable metrics (e.g., "reduced latency by 20%", "managed team of 5")?
+   - Deduct heavily for vague statements or simply listing responsibilities without outcomes.
 
-${resumeText}`;
+3. Keyword Optimization & Context (25 points)
+   - Are relevant technical and soft skills clearly present?
+   - Are these skills contextualized within the experience section, rather than just dumped in a list?
+   - Deduct points if skills are listed without any proof of application in the experience section.
+
+4. Structure, Clarity & Professionalism (20 points)
+   - Is the experience in reverse-chronological order?
+   - Is the writing concise, professional, and free of typos?
+   - Deduct points for meaningless buzzwords, fluff, or irrelevant information.
+
+SCORING INTERPRETATION:
+90-100: Exceptional. Highly optimized for ATS, strong metrics, clear impact.
+80-89: Strong. Good formatting and metrics, minor optimizations needed.
+70-79: Average. Missing some metrics or keyword context, formatting might need tweaks.
+50-69: Weak. Lacks quantifiable impact, poor formatting, or relies on generic buzzwords.
+0-49: Very Poor. Likely to be rejected by an ATS due to severe formatting or content issues.
+
+IMPORTANT INSTRUCTIONS FOR IMPROVEMENTS:
+- Do NOT output generic advice like "Improve your resume" or "Add more metrics".
+- Quote the specific weak bullet point or section from the resume, and explain exactly why it fails ATS checks.
+- Provide a clear, actionable example of how to rewrite it.
+- If a project sounds like a generic tutorial, point it out.
+- Do not fabricate facts. Recommend solutions that the candidate can truthfully implement.
+
+RESUME TEXT TO EVALUATE:
+${resumeText}
+`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",
@@ -35,159 +62,36 @@ ${resumeText}`;
         type: Type.OBJECT,
 
         properties: {
-          personalInfo: {
-            type: Type.OBJECT,
-
-            properties: {
-              name: {
-                type: Type.STRING,
-              },
-
-              email: {
-                type: Type.STRING,
-              },
-
-              phone: {
-                type: Type.STRING,
-              },
-
-              location: {
-                type: Type.STRING,
-              },
-
-              linkedin: {
-                type: Type.STRING,
-              },
-
-              github: {
-                type: Type.STRING,
-              },
-            },
-
-            required: [
-              "name",
-              "email",
-              "phone",
-              "location",
-              "linkedin",
-              "github",
-            ],
+          atsScore: {
+            type: Type.NUMBER,
           },
 
           summary: {
             type: Type.STRING,
           },
 
-          skills: {
-            type: Type.ARRAY,
-
-            items: {
-              type: Type.STRING,
-            },
-          },
-
-          experience: {
+          improvements: {
             type: Type.ARRAY,
 
             items: {
               type: Type.OBJECT,
 
               properties: {
-                company: {
+                problem: {
                   type: Type.STRING,
                 },
 
-                role: {
-                  type: Type.STRING,
-                },
-
-                duration: {
-                  type: Type.STRING,
-                },
-
-                description: {
+                solution: {
                   type: Type.STRING,
                 },
               },
 
-              required: ["company", "role", "duration", "description"],
-            },
-          },
-
-          education: {
-            type: Type.ARRAY,
-
-            items: {
-              type: Type.OBJECT,
-
-              properties: {
-                institution: {
-                  type: Type.STRING,
-                },
-
-                degree: {
-                  type: Type.STRING,
-                },
-
-                field: {
-                  type: Type.STRING,
-                },
-
-                duration: {
-                  type: Type.STRING,
-                },
-              },
-
-              required: ["institution", "degree", "field", "duration"],
-            },
-          },
-
-          projects: {
-            type: Type.ARRAY,
-
-            items: {
-              type: Type.OBJECT,
-
-              properties: {
-                name: {
-                  type: Type.STRING,
-                },
-
-                description: {
-                  type: Type.STRING,
-                },
-
-                technologies: {
-                  type: Type.ARRAY,
-
-                  items: {
-                    type: Type.STRING,
-                  },
-                },
-              },
-
-              required: ["name", "description", "technologies"],
-            },
-          },
-
-          certifications: {
-            type: Type.ARRAY,
-
-            items: {
-              type: Type.STRING,
+              required: ["problem", "solution"],
             },
           },
         },
 
-        required: [
-          "personalInfo",
-          "summary",
-          "skills",
-          "experience",
-          "education",
-          "projects",
-          "certifications",
-        ],
+        required: ["atsScore", "summary", "improvements"],
       },
     },
   });

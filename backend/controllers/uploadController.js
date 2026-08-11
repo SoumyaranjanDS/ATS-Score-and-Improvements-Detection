@@ -1,4 +1,5 @@
 import uploadToCloudinary from "../utils/uploadToCloudinary.js";
+import { extractPdfText } from "../services/pdfService.js";
 
 const uploadFile = async (req, res) => {
   try {
@@ -8,6 +9,8 @@ const uploadFile = async (req, res) => {
         message: "failed to upload file",
       });
     }
+
+    const pdfText = await extractPdfText(req.file.buffer);
 
     const result = await uploadToCloudinary(req.file.buffer, {
       folder: "ats-resume",
@@ -22,6 +25,7 @@ const uploadFile = async (req, res) => {
         publicId: result.public_id,
         format: result.format,
         size: result.bytes,
+        text: pdfText,
       },
     });
   } catch (error) {
@@ -34,6 +38,4 @@ const uploadFile = async (req, res) => {
   }
 };
 
-export {
-  uploadFile,
-};
+export { uploadFile };

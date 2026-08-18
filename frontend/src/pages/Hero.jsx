@@ -34,7 +34,7 @@ const Hero = () => {
       console.error(err);
       setError(true);
       setMessage(
-        err.response?.data?.message || "Error uploading file. Please try again."
+        err.response?.data?.message || "Error | Please try again."
       );
     } finally {
       setLoading(false);
